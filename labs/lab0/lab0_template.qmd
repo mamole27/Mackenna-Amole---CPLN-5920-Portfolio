@@ -46,10 +46,10 @@ Explore the structure of your data and answer these questions:
 
 ```{r explore-structure}
 # Use glimpse() to see the data structure
-
+glimpse(car_data)
 
 # Check the column names
-
+colnames(car_data)
 
 # Look at the first few rows
 head(car_data)
@@ -61,11 +61,16 @@ head(car_data)
 - Are there any column names that might cause problems? Why?
 
 **Your answers:**
-- Rows: [YOUR ANSWER]
-- Columns: [YOUR ANSWER]  
-- Variable types: [YOUR ANSWER]
-- Problematic names: [YOUR ANSWER]
-
+- Rows: 50,000
+- Columns: 7
+- Variable types: numeric (dbl) & character
+model - character
+engine size - numeric
+fuel type - character
+year of manufacture - numeric
+mileage - numeric 
+price - numeric
+- Problematic names: all columns with two words because R does not read spaces
 ## 1.2 Tibble vs Data Frame
 
 Compare how tibbles and data frames display:
@@ -81,7 +86,7 @@ car_df
 
 **Question:** What differences do you notice in how they print?
 
-**Your answer:** [YOUR ANSWER]
+**Your answer:** the data frame provides all of the observations while the tibble showed only the first few to give a sample of the set
 
 # Exercise 2: Basic Column Operations
 
@@ -91,13 +96,14 @@ Practice selecting different combinations of columns:
 
 ```{r column-selection}
 # Select just Model and Mileage columns
-
+select(car_data, Model, Mileage)
 
 # Select Manufacturer, Price, and Fuel type
-
+select(car_data, Manufacturer, Price, Fuel Type)
 
 # Challenge: Select all columns EXCEPT Engine Size
-
+car_data%>%select(-`Engine Size`)
+select(-Engine Size)
 ```
 
 ## 2.2 Renaming Columns
@@ -106,7 +112,9 @@ Let's fix a problematic column name:
 
 ```{r rename-columns}
 # Rename 'Year of manufacture' to year
-
+car_data <- car_data%>%rename(year=`Year of manufacture`)
+# rename(year = `year of manufacture` , car_data)
+#traditional above, but in tidyverse need to pipe %>%
 
 # Check that it worked
 names(car_data)
@@ -114,7 +122,7 @@ names(car_data)
 
 **Question:** Why did we need backticks around `Year of manufacture` but not around `year`?
 
-**Your answer:** [YOUR ANSWER]
+**Your answer:** because R does not read the spaces, the ticks indicate to R that it reads the three words as one column name
 
 # Exercise 3: Creating New Columns
 
@@ -122,22 +130,29 @@ names(car_data)
 
 ```{r calculate-age}
 # Create an 'age' column (2025 minus year of manufacture)
-
+car_data <- car_data%>%mutate(age=2025-year)
+#mutate(car_data, age=2025-year)
 
 # Create a mileage_per_year column  
-
+car_data <- car_data%>%mutate(mileage_per_year=Mileage/age)
 
 # Look at your new columns
-#select(car_data, Model, year, age, Mileage, mileage_per_year)
+select(car_data, Model, year, age, Mileage, mileage_per_year)
 ```
 
 ## 3.2 Categorize Cars
 
 ```{r categorize-cars}
-# Create a price_category column where if price is < 15000, its is coded as budget, between 15000 and 30000 is midrange and greater than 30000 is mid-range (use case_when)
+# Create a price_category column where if price is < 15000, its is coded as budget, between 15000 and 30000 is midrange and greater than 30000 is pricey (use case_when)
+car_data <- car_data%>%mutate(
+  category=case_when(
+    Price<15000~"budget", 
+    Price>=15000 & Price<=30000~"midrange", 
+    Price>30000~"pricey"))
 
 
 # Check your categories select the new column and show it
+select(car_data, category)
 ```
 
 # Exercise 4: Filtering Practice
@@ -146,7 +161,7 @@ names(car_data)
 
 ```{r basic-filtering}
 # Find all Toyota cars
-
+filter(car_data, Manufacturer=="Toyota")
 
 # Find cars with mileage less than 30,000
 
