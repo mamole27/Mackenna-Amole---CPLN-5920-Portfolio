@@ -1,8 +1,8 @@
 ---
 title: "Lab 0: Getting Started with dplyr"
 subtitle: "Your First Data Analysis"
-author: "Your Name Here"
-date: today
+author: "Mackenna Amole"
+date: 26 January 2026
 format: 
   html:
     code-fold: false
@@ -99,12 +99,10 @@ Practice selecting different combinations of columns:
 select(car_data, Model, Mileage)
 
 # Select Manufacturer, Price, and Fuel type
-select(car_data, Manufacturer, Price, Fuel Type)
+select(car_data, Manufacturer, Price, `Fuel Type`)
 
 # Challenge: Select all columns EXCEPT Engine Size
-car_data%>%select(-`Engine Size`)
-select(-Engine Size)
-```
+car_data %>% select(-`Engine Size`)
 
 ## 2.2 Renaming Columns
 
@@ -113,6 +111,7 @@ Let's fix a problematic column name:
 ```{r rename-columns}
 # Rename 'Year of manufacture' to year
 car_data <- car_data%>%rename(year=`Year of manufacture`)
+
 # rename(year = `year of manufacture` , car_data)
 #traditional above, but in tidyverse need to pipe %>%
 
@@ -130,6 +129,7 @@ names(car_data)
 
 ```{r calculate-age}
 # Create an 'age' column (2025 minus year of manufacture)
+glimpse(car_data)
 car_data <- car_data%>%mutate(age=2025-year)
 #mutate(car_data, age=2025-year)
 
@@ -161,31 +161,34 @@ select(car_data, category)
 
 ```{r basic-filtering}
 # Find all Toyota cars
-filter(car_data, Manufacturer=="Toyota")
+filter(car_data, Manufacturer == "Toyota")
 
 # Find cars with mileage less than 30,000
-
+filter(car_data, Mileage < 30000)
+#data <- data.frame(name = c("John", "Jane", "Doe", "Smith"),age = c(23, 45, 31, 28),gender = c("Male", "Female", "Male", "Male"))
 
 # Find luxury cars (from price category) with low mileage
-
+filter(car_data, Mileage < 30000, category == "pricey")
 ```
 
 ## 4.2 Multiple Conditions
 
 ```{r multiple-conditions}
 # Find cars that are EITHER Honda OR Nissan
-
+filter(car_data, Manufacturer %in% c("Honda", "Nissan"))
 
 # Find cars with price between $20,000 and $35,000
-
+filter(car_data, Price >= 20000, Price <= 35000)
 
 # Find diesel cars less than 10 years old
-
+names(car_data)
+diesel_under_10 <- filter(car_data, `Fuel type` == "Diesel", age < 10)
+diesel_under_10
 ```
 
 **Question:** How many diesel cars are less than 10 years old?
 
-**Your answer:** [YOUR ANSWER]
+**Your answer:** 2,040
 
 # Exercise 5: Grouping and Summarizing
 
@@ -193,24 +196,31 @@ filter(car_data, Manufacturer=="Toyota")
 
 ```{r basic-summaries}
 # Calculate average price by manufacturer
-avg_price_by_brand <- car_data %>%
+avg_price_by_manufacturer <- car_data %>%
   group_by(Manufacturer) %>%
-  summarize(avg_price = mean(Price, na.rm = TRUE))
-
-avg_price_by_brand
+  summarize(
+    avg_price = mean(Price, na.rm = TRUE)
+  )
+avg_price_by_manufacturer
 
 # Calculate average mileage by fuel type
-
+avg_mileage_by_fuel <- car_data %>%
+  group_by(`Fuel type`) %>%
+  summarize(avg_mileage = mean(Mileage, na.rm = TRUE))
+avg_mileage_by_fuel
 
 # Count cars by manufacturer
-
+count_by_manufacturer <- car_data %>%
+  count(Manufacturer)
+count_by_manufacturer
 ```
 
 ## 5.2 Categorical Summaries
 
 ```{r categorical-summaries}
 # Frequency table for price categories
-
+car_data %>%
+  count(category)
 ```
 
 
